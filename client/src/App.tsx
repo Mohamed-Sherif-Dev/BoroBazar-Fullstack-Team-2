@@ -1,9 +1,13 @@
-
+import Footer from "./layout/Footer";
+import Navbar from "./layout/Navbar";
 
 const App = () => {
   return (
-    <div>App</div>
-  )
-}
+    <div>
+      <Navbar />
+      <Footer />
+    </div>
+  );
+};
 
-export default App
+export default App;
