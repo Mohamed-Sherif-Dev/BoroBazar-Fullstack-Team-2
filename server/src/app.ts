@@ -1,13 +1,22 @@
 import express from "express"
 import cors from "cors"
-
+import dotenv from "dotenv"
+dotenv.config()
+// import authRoutes from "./routes/auth.routes";
+import categoryRoutes from "./routes/category.routes";
+import productRoutes from "./routes/product.routes";
 const app = express()
 
 /* =====================
    Middlewares
 ===================== */
 
-app.use(cors())
+app.use(cors(
+  {
+    origin: "http://localhost:3000",
+    credentials: true
+  }
+))
 
 app.use(express.json())
 
@@ -27,6 +36,10 @@ app.get("/", (req, res) => {
 /* =====================
    Routes
 ===================== */
+
+
+app.use("/api/categories", categoryRoutes);
+app.use("/api", productRoutes);
 
 // example
 // import authRoutes from "./routes/auth.routes"
