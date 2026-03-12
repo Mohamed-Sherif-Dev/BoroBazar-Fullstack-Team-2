@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Order from '../models/Order.model';
-import Cart from '../models/cart.model';
+import Cart from '../models/Cart.model';
 
 export const createOrder = async (req: Request, res: Response) => {
   try {

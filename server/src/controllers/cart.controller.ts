@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Cart from '../models/cart.model';
+import Cart from '../models/Cart.model';
 
 export const addToCart = async (req: Request, res: Response) => {
   try {

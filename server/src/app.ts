@@ -2,7 +2,7 @@ import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
 dotenv.config()
-// import authRoutes from "./routes/auth.routes";
+import authRoutes from "./routes/auth.routes";
 import categoryRoutes from "./routes/category.routes";
 import productRoutes from "./routes/product.routes";
 import cartRoutes from './routes/cart.routes';
@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
    Routes
 ===================== */
 
-
+app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api", productRoutes);
 app.use('/api/cart', cartRoutes);
