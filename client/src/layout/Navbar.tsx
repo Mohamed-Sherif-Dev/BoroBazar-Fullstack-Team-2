@@ -53,7 +53,7 @@ function Navbar() {
                   />
                 </Link>
                 <Link
-                  to="#"
+                  to="/cart"
                   className="cursor-pointer hover:scale-105 transition duration-300"
                 >
                   <img

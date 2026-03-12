@@ -1,19 +1,21 @@
-import Footer from "./layout/Footer";
 import Navbar from "./layout/Navbar";
+import Footer from "./layout/Footer";
+import AppRouter from "./routes/AppRouter";
 
 const App = () => {
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
+
       <Navbar />
+
+      <main className="flex-1">
+        <AppRouter />
+      </main>
+
       <Footer />
+
     </div>
   );
 };
-
-import Home from "./pages/Home"
-
-function App() {
-  return <Home/>
-}
 
 export default App;
