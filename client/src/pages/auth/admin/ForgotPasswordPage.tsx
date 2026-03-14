@@ -8,6 +8,7 @@ import AdminInputField from "../../../components/auth/admin/InputField";
 import { forgotPasswordSchema, type ForgotPasswordSchema } from "../../../lib/Validations";
 import { forgotPassword } from "../../../hooks/UseAuthApi";
 
+
 const AdminForgotPasswordPage = () => {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState("");
@@ -49,9 +50,15 @@ const AdminForgotPasswordPage = () => {
       <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         {/* Icon */}
         <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center">
-            <img src="/Forget-pass.png" alt="Email Icon" />
-          </div>
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-16 h-16">
+            <rect x="12" y="36" width="44" height="32" rx="5" fill="#FFA726" />
+            <rect x="12" y="36" width="44" height="17" rx="5" fill="#FB8C00" />
+            <path d="M22 36V26a12 12 0 0124 0v10" stroke="#FB8C00" strokeWidth="5" strokeLinecap="round" fill="none"/>
+            <circle cx="34" cy="52" r="6" fill="white" />
+            <circle cx="56" cy="22" r="14" fill="#29B6F6" />
+            <text x="56" y="27" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold" fontFamily="sans-serif">?</text>
+          </svg>
+          
         </div>
 
         {/* Header */}

@@ -27,14 +27,14 @@ function Navbar() {
             <div className="hidden md:flex items-center gap-5">
               <div className="flex gap-2 text-[15px]">
                 <Link
-                  to="#"
+                  to="/login"
                   className="hover:text-green-900 transition duration-300"
                 >
                   Login
                 </Link>
                 <span>|</span>
                 <Link
-                  to="#"
+                  to="/register"
                   className="hover:text-green-900 transition duration-300"
                 >
                   Register
