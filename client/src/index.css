@@ -1,9 +1,13 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-CustomGreen: #02B290;
+  --color-CustomGreenHover: #0F948F;
+  --color-CustomGreyBg: #F8F8F8;
+}
 
 @layer base {
   :root {
@@ -80,12 +84,12 @@
   }
 
   * {
-    @apply border-border;
+    /* @apply border-border; */
     outline-color: oklch(var(--ring) / 0.5);
   }
 
   body {
-    @apply bg-background text-foreground;
+    /* @apply bg-background text-foreground; */
   }
 
   html {
