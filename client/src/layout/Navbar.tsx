@@ -43,7 +43,7 @@ function Navbar() {
 
               <div className="flex items-center gap-5">
                 <Link
-                  to="#"
+                  to="wishlist"
                   className="cursor-pointer hover:scale-105 transition duration-300"
                 >
                   <img

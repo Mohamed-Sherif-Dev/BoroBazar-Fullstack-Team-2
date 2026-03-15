@@ -1,4 +1,4 @@
-import type { CartItemType } from "../types/cart.types"
+import type { CartItemType } from "../../../types/cart.types"
 import QuantityStepper from "./QuantityStepper"
 
 interface Props{
