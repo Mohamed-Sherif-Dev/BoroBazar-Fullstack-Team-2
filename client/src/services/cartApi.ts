@@ -1,5 +1,5 @@
 import axios from "axios"
-import type { CartItemType } from './../types/cart.types';
+import type { CartItemType } from '../types/cart.types';
 
 
 export const getCart = async (): Promise<CartItemType[]> => {
