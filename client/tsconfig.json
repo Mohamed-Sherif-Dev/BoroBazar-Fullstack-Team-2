@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
  { "compilerOptions": {
     "baseUrl": ".",
@@ -5,10 +6,17 @@
       "@/*": ["src/*"]
     }
   },
+=======
+{
+>>>>>>> dashboard
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ]
+<<<<<<< HEAD
 
  }
+=======
+}
+>>>>>>> dashboard
