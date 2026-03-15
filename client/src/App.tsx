@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -25,5 +26,17 @@ const App = () => {
     </QueryClientProvider>
   );
 };
+=======
+import HomePage from "./pages/HomePage";
+
+
+function App() {
+  return (
+    <>
+      <HomePage />
+    </>
+  );
+}
+>>>>>>> dashboard
 
 export default App;
