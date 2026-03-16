@@ -1,5 +1,5 @@
 import CartItem from "./CartItem"
-import type { CartItemType } from "../types/cart.types"
+import type { CartItemType } from "../../../types/cart.types"
 
 interface Props{
  items:CartItemType[]
