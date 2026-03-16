@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
@@ -9,6 +8,8 @@ import productRoutes from "./routes/product.routes";
 import cartRoutes from './routes/cart.routes';
 import wishlistRoutes from './routes/wishlist.routes';
 import orderRoutes from './routes/order.routes';
+import adminRoutes from "./modules/admin/admin.routes";
+
 const app = express()
 
 /* =====================
@@ -17,7 +18,7 @@ const app = express()
 
 app.use(cors(
   {
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "http://localhost:5173"],
     credentials: true
   }
 ))
@@ -47,31 +48,10 @@ app.use("/api", productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/orders', orderRoutes);
-
-// example
-// import authRoutes from "./routes/auth.routes"
-// app.use("/api/auth", authRoutes)
+app.use("/admin", adminRoutes);
 
 /* =====================
    Export App
 ===================== */
 
 export default app
-=======
-import express from "express";
-import cors from "cors";
-import adminRoutes from "./modules/admin/admin.routes";
-
-const app = express();
-
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-  }),
-);
-app.use(express.json());
-
-app.use("/admin", adminRoutes);
-
-export default app;
->>>>>>> dashboard

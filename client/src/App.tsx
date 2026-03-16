@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-
-import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Navbar from "./layout/Navbar";
@@ -12,31 +9,17 @@ const queryClient = new QueryClient();
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      {/* <BrowserRouter> */}
-        <div className="min-h-screen flex flex-col">
-          <Navbar />
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
 
-          <main className="flex-1">
-            <AppRouter />
-          </main>
+        <main className="flex-1">
+          <AppRouter />
+        </main>
 
-          <Footer />
-        </div>
-      {/* </BrowserRouter> */}
+        <Footer />
+      </div>
     </QueryClientProvider>
   );
 };
-=======
-import HomePage from "./pages/HomePage";
-
-
-function App() {
-  return (
-    <>
-      <HomePage />
-    </>
-  );
-}
->>>>>>> dashboard
 
 export default App;

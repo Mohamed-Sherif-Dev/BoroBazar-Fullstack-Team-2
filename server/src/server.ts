@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import dotenv from "dotenv"
 import app from "./app"
 import mongoose from "mongoose"
@@ -36,12 +35,3 @@ const startServer = async () => {
 }
 
 startServer()
-=======
-import app from "./app";
-
-const PORT = 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
->>>>>>> dashboard
