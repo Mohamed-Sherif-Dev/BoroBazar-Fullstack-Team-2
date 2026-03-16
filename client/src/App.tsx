@@ -1,5 +1,5 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Navbar from "./layout/Navbar";
 import Footer from "./layout/Footer";
 import AppRouter from "./routes/AppRouter";
