@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import adminbg from "../../../assets/images/auth-bg.png";
+import logo from "../../../assets/images/Logo.png";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -12,14 +14,16 @@ const AdminAuthLayout = ({ children, activePage }: AuthLayoutProps) => {
   return (
     <div className="min-h-screen w-full flex flex-col relative overflow-hidden bg-white">
       {/* Background */}
-      <div className="absolute inset-0 z-0 bg-[url('/auth-bg.png')] bg-no-repeat bg-cover bg-center opacity-10" />
+      <div className="absolute inset-0 z-0  bg-no-repeat bg-cover bg-center opacity-10" 
+      
+        style={{ backgroundImage: `url(${adminbg})` }}/>
 
       {/* Content Layer */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Header */}
         <header className="w-full px-4 sm:px-6 py-3 flex items-center justify-between">
           <img
-            src="/Logo.png"
+            src={logo}
             alt="BoroBazar Logo"
             className="w-32 sm:w-44 md:w-60 h-8 sm:h-10 object-contain"
           />

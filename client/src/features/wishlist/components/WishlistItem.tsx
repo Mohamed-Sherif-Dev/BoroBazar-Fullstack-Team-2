@@ -1,4 +1,4 @@
-import type { WishlistItemType } from "../types/wishlist.types";
+import type { WishlistItemType } from "../../../types/wishlist.types";
 
 interface Props {
   item: WishlistItemType;
