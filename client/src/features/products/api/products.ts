@@ -2,7 +2,7 @@ import axios from "axios";
 import type { IProduct } from "../../../types/product";
 
 const apiClient = axios.create({
-  baseURL: "/api",
+  baseURL: "https://5e8f-41-236-161-153.ngrok-free.app/api",
   headers: {
     "Content-Type": "application/json",
   },
