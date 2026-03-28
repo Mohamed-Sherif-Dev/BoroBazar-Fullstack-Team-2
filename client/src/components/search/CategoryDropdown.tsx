@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { mockCategories } from "../../mock/mockCategories";
 import type { Category } from "../../types/category";
 import downIcon from "../../assets/Icons/navbar/downIcon.png";
+import { useCategories } from "@/hooks/useCategories";
 
 function CategoryDropdown() {
   const [more, setMore] = useState(false);
   const [visibleCount, setVisibleCount] = useState(9);
-  const categories = mockCategories;
 
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") ?? "";
+
+  const { data: categories = [], isLoading, error } = useCategories();
 
   useEffect(() => {
     function handleResize() {
@@ -41,11 +42,29 @@ function CategoryDropdown() {
     navigate(`/products?${params.toString()}`);
   }
 
+  if (isLoading) {
+    return (
+      <div className="mt-5 text-center flex justify-center items-center gap-2">
+        Loading categories
+        <span className="inline-block w-10 h-10 border-4 border-white border-b-[#FF3D00] rounded-full animate-spin box-border"></span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mt-5 text-center text-red-700">
+        Failed to load categories
+      </div>
+    );
+  }
+
   return (
     <section>
       <ul className="mt-5 flex justify-evenly">
         {categories.slice(0, visibleCount).map((category: Category) => (
           <li key={category._id}>
+          <li key={category.id}>
             <button
               className={`cursor-pointer duration-300 hover:text-zinc-800 ${
                 selectedCategory === category._id
@@ -62,7 +81,7 @@ function CategoryDropdown() {
           </li>
         ))}
 
-        <li className="relative">
+        <li className="relative z-50">
           <button
             type="button"
             className="flex cursor-pointer items-end gap-1"
@@ -80,13 +99,16 @@ function CategoryDropdown() {
 
           {more && (
             <ul
-              className="absolute left-1/2 mt-2
-            flex min-w-[120px] -translate-x-1/2 flex-col rounded-lg bg-white p-3 shadow-lg"
+              className="absolute left-1/2 mt-2 max-h-40 overflow-y-scroll
+            flex min-w-[120px] 
+            -translate-x-1/2 flex-col rounded-lg bg-white p-3 shadow-lg"
             >
               {categories
                 .slice(visibleCount)
                 .map((category: Category, index: number, arr: Category[]) => (
                   <li key={category._id}>
+                .map((category: Category, index: number, arr: []) => (
+                  <li key={category.id}>
                     <button
                       className={`w-full cursor-pointer duration-300 hover:text-zinc-800 
                         text-center ${
@@ -105,6 +127,9 @@ function CategoryDropdown() {
                   {index !== arr.length - 1 && <hr className="my-3" />}
                 </li>
               ))}
+                    {index !== arr.length - 1 && <hr className="my-3" />}
+                  </li>
+                ))}
             </ul>
           )}
         </li>

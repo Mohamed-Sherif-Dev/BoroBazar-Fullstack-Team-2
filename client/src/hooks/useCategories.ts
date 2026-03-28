@@ -5,7 +5,7 @@ export function useCategories() {
   return useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
-    enabled: false,
+    enabled: true,
   });
 }
 
