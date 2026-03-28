@@ -19,13 +19,15 @@ import AdminLoginPage from "../pages/auth/admin/LoginPage";
 import AdminRegisterPage from "../pages/auth/admin/RegisterPage";
 import AdminForgotPasswordPage from "../pages/auth/admin/ForgotPasswordPage";
 import AdminVerifyOTPPage from "../pages/auth/admin/VerifyOTPPage";
+import AdminDashboardPage from "../pages/AdminDashboardPage";
 
 const AppRouter = () => {
   return (
     <Routes>
 
       {/* ─── Store Routes ─── */}
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="/home" element={<Home />} />
       <Route path="/products" element={<ProductsPage />} />
       <Route path="/products/:id" element={<ProductDetails />} />
       <Route path="/cart" element={<CartPage />} />
@@ -42,9 +44,12 @@ const AppRouter = () => {
       <Route path="/admin/register" element={<AdminRegisterPage />} />
       <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
       <Route path="/admin/verify" element={<AdminVerifyOTPPage />} />
+      
+      {/* ─── Admin Dashboard ─── */}
+      <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
 
       {/* ─── Fallback ─── */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
 
     </Routes>
   );

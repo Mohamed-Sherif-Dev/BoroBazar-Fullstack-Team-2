@@ -1,11 +1,14 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import mongoose from 'mongoose';
 import Wishlist from '../models/Wishlist.model'; 
-export const toggleWishlist = async (req: Request, res: Response) => {
-  try {
-    const { userId, productId } = req.body;
+import { AuthRequest } from '../middlewares/auth.middleware';
 
-    if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(productId)) {
+export const toggleWishlist = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { productId } = req.body;
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(productId)) {
       return res.status(400).json({ message: "Invalid User or Product ID" });
     }
 
@@ -35,9 +38,9 @@ export const toggleWishlist = async (req: Request, res: Response) => {
   }
 };
 
-export const getWishlist = async (req: Request, res: Response) => {
+export const getWishlist = async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user?.userId;
     const wishlist = await Wishlist.findOne({ userId }).populate('products');
     
     if (!wishlist) return res.status(404).json({ message: "Wishlist empty" });
@@ -47,15 +50,15 @@ export const getWishlist = async (req: Request, res: Response) => {
   }
 };
 
-export const removeFromWishlist = async (req: Request, res: Response) => {
+export const removeFromWishlist = async (req: AuthRequest, res: Response) => {
   try {
-    const { userId, productId } = req.params;
+    const userId = req.user?.userId;
+    const { productId } = req.params;
 
-    // بنحدث الـ Wishlist ونشيل الـ productId من الـ array باستخدام $pull
     const wishlist = await Wishlist.findOneAndUpdate(
       { userId },
       { $pull: { products: productId } },
-      { new: true } // عشان يرجع الـ wishlist بعد التعديل
+      { new: true }
     );
 
     if (!wishlist) {
@@ -66,4 +69,4 @@ export const removeFromWishlist = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Error removing from wishlist", error });
   }
-};
+};

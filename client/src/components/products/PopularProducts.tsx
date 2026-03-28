@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import ProductCard from "./ProductCard";
 import { getPopularProducts } from "../../services/productService";
-import type { Product } from "../../types/product";
 
 const CATEGORIES = [
   "Breads & Bakery",
@@ -12,7 +11,7 @@ const CATEGORIES = [
 ];
 
 export default function PopularProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("Breads & Bakery");
   const [loading, setLoading] = useState(true);
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -99,7 +98,7 @@ export default function PopularProducts() {
                 className="min-w-[220px] aspect-[4/5] rounded-xl bg-gray-50 animate-pulse"
               ></div>
             ))
-            : products.map((product) => (
+            : products.map((product: any) => (
               <div
                 key={product.id}
                 className="min-w-[220px] max-w-[240px] flex-shrink-0"
@@ -113,7 +112,7 @@ export default function PopularProducts() {
   );
 }
 
-function getMockPopularProducts(): Product[] {
+function getMockPopularProducts(): any[] {
   return Array.from({ length: 8 }).map((_, i) => ({
     id: i + 1,
     name: "100 Percent Apple Juice – 64 fl oz Bottle",

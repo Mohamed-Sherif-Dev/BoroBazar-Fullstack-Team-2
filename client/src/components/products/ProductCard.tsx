@@ -1,10 +1,6 @@
-import type { Product } from "../../types/product";
 
-type Props = {
-  product: Product;
-};
 
-export default function ProductCard({ product }: Props) {
+const ProductCard = ({ product }: { product: any }) => {
   // Mock rating for demo
   const rating = product.rating || 4;
 
@@ -89,4 +85,6 @@ export default function ProductCard({ product }: Props) {
       </div>
     </div>
   );
-}
+};
+
+export default ProductCard;

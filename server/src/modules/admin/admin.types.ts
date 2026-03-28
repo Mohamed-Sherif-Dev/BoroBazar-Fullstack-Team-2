@@ -29,10 +29,26 @@ export interface User {
 }
 
 export interface Order {
-  id: number;
-  userId: number;
-  total: number;
+  id?: number;
+  _id?: any;
+  userId: any;
+  total?: number;
+  totalPrice?: number;
   status: string;
+  items?: any[];
+  shippingAddress?: string;
+  paymentMethod?: string;
+  createdAt?: string;
+}
+
+export interface PaginatedOrders {
+  orders: any[]; // Using any[] to map from DB type easily without strict interface overlap, or any document type.
+  pagination: {
+    totalDocuments: number;
+    totalPages: number;
+    currentPage: number;
+    limit: number;
+  };
 }
 
 export interface DashboardStats {
@@ -40,4 +56,25 @@ export interface DashboardStats {
   totalUsers: number;
   totalOrders: number;
   totalProducts: number;
+  totalCategories: number;
+}
+
+export interface PaginatedProducts {
+  products: any[];
+  pagination: {
+    totalDocuments: number;
+    totalPages: number;
+    currentPage: number;
+    limit: number;
+  };
+}
+
+export interface PaginatedUsers {
+  users: any[];
+  pagination: {
+    totalDocuments: number;
+    totalPages: number;
+    currentPage: number;
+    limit: number;
+  };
 }

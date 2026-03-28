@@ -29,7 +29,7 @@ const AdminLoginPage = () => {
           ? localStorage
           : sessionStorage;
       storage.setItem("token", data.token);
-      navigate("/admin");
+      navigate("/admin/dashboard");
     },
     onError: (error: any) => {
       const msg =

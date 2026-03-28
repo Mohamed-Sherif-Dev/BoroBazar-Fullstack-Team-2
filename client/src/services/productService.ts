@@ -1,13 +1,11 @@
 import axios from "axios"
 
-const API = "http://localhost:5000"
-
 export const getFProducts = async () => {
-  const res = await axios.get(`${API}/products/featured`)
+  const res = await axios.get("/api/products/featured")
   return res.data
 }
 
 export const getPopularProducts = async () => {
-  const res = await axios.get(`${API}/products/popular`)
+  const res = await axios.get("/api/products/popular")
   return res.data
 }

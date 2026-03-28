@@ -36,7 +36,7 @@ function CategoryDropdown() {
   function search(category: Category) {
     const params = new URLSearchParams(searchParams);
 
-    params.set("category", category.id);
+    params.set("category", category._id);
 
     navigate(`/products?${params.toString()}`);
   }
@@ -44,11 +44,11 @@ function CategoryDropdown() {
   return (
     <section>
       <ul className="mt-5 flex justify-evenly">
-        {categories.slice(0, visibleCount).map((category) => (
-          <li key={category.id}>
+        {categories.slice(0, visibleCount).map((category: Category) => (
+          <li key={category._id}>
             <button
               className={`cursor-pointer duration-300 hover:text-zinc-800 ${
-                selectedCategory === category.id
+                selectedCategory === category._id
                   ? "font-semibold text-green-700"
                   : "text-zinc-700"
               }`}
@@ -83,22 +83,24 @@ function CategoryDropdown() {
               className="absolute left-1/2 mt-2
             flex min-w-[120px] -translate-x-1/2 flex-col rounded-lg bg-white p-3 shadow-lg"
             >
-              {categories.slice(visibleCount).map((category, index, arr) => (
-                <li key={category.id}>
-                  <button
-                    className={`w-full cursor-pointer duration-300 hover:text-zinc-800 
+              {categories
+                .slice(visibleCount)
+                .map((category: Category, index: number, arr: Category[]) => (
+                  <li key={category._id}>
+                    <button
+                      className={`w-full cursor-pointer duration-300 hover:text-zinc-800 
                         text-center ${
-                          selectedCategory === category.id
+                          selectedCategory === category._id
                             ? "font-semibold text-green-700"
                             : "text-zinc-700"
                         }`}
-                    onClick={() => {
-                      setMore(false);
-                      search(category);
-                    }}
-                  >
-                    {category.name}
-                  </button>
+                      onClick={() => {
+                        setMore(false);
+                        search(category);
+                      }}
+                    >
+                      {category.name}
+                    </button>
 
                   {index !== arr.length - 1 && <hr className="my-3" />}
                 </li>

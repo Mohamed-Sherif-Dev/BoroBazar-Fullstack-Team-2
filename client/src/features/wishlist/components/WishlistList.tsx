@@ -1,4 +1,4 @@
-import React from "react";
+
 import { X, Star } from "lucide-react";
 
 interface WishlistItem {
@@ -15,9 +15,10 @@ interface WishlistItem {
 
 interface Props {
   items?: WishlistItem[];
+  onRemove?: (id: number) => void;
 }
 
-const WishlistItemComponent = ({ item }: { item: WishlistItem }) => (
+const WishlistItemComponent = ({ item, onRemove }: { item: WishlistItem, onRemove?: (id: number) => void }) => (
   <div className="relative p-6 border-b border-gray-200 last:border-0 flex gap-6 items-start">
 
     {/* Product Image */}
@@ -55,6 +56,7 @@ const WishlistItemComponent = ({ item }: { item: WishlistItem }) => (
 
     {/* Remove Button (Absolute top right) */}
     <button
+      onClick={() => onRemove && onRemove(item.id)}
       className="absolute top-6 right-6 text-gray-800 hover:text-red-500 transition-colors"
       title="Remove from wishlist"
     >
@@ -63,7 +65,7 @@ const WishlistItemComponent = ({ item }: { item: WishlistItem }) => (
   </div>
 );
 
-export default function WishlistList({ items }: Props) {
+export default function WishlistList({ items, onRemove }: Props) {
   return (
     <div className="flex flex-col">
       {/* Header of the List Card */}
@@ -79,7 +81,7 @@ export default function WishlistList({ items }: Props) {
       {/* Items Loop */}
       <div className="flex flex-col">
         {items?.map((item) => (
-          <WishlistItemComponent key={item.id} item={item} />
+          <WishlistItemComponent key={item.id} item={item} onRemove={onRemove} />
         ))}
       </div>
     </div>

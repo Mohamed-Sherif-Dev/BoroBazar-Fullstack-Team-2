@@ -15,7 +15,7 @@ export type ProductItem = {
   oldPrice?: number;
   sales: number;
   stock: number;
-  rating: number;
+  rating: number; 
 };
 
 export type UserItem = {

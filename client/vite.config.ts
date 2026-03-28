@@ -11,9 +11,6 @@ export default defineConfig({
         target: "https://93dd-41-236-161-153.ngrok-free.app",
         changeOrigin: true,
         secure: false,
-        headers: {
-          "ngrok-skip-browser-warning": "true",
-        },
       },
     },
   },

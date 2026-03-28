@@ -1,4 +1,9 @@
-import { DashboardStats, Order, Product, User, ChartItem } from "./admin.types";
+import mongoose from "mongoose";
+import { DashboardStats, Order, Product, User, ChartItem, PaginatedOrders, PaginatedProducts, PaginatedUsers } from "./admin.types";
+import UserModel from "../../models/user.model";
+import OrderModel from "../../models/Order.model";
+import ProductModel from "../../models/Product.model";
+import CategoryModel from "../../models/Category.models";
 
 let products: Product[] = [
   {
@@ -141,14 +146,26 @@ let orders: Order[] = [
   { id: 2, userId: 2, total: 800, status: "pending" },
 ];
 
-export const getDashboardData = (): DashboardStats => {
-  const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
+export const getDashboardData = async (): Promise<DashboardStats> => {
+  const [totalUsers, totalOrders, totalProducts, totalCategories, orderAgg] = await Promise.all([
+    UserModel.countDocuments(),
+    OrderModel.countDocuments(),
+    ProductModel.countDocuments(),
+    CategoryModel.countDocuments(),
+    OrderModel.aggregate([
+      { $match: { status: { $ne: 'Cancelled' } } },
+      { $group: { _id: null, totalSales: { $sum: "$totalPrice" } } }
+    ])
+  ]);
+
+  const totalSales = orderAgg.length > 0 ? orderAgg[0].totalSales : 0;
 
   return {
     totalSales,
-    totalUsers: users.length,
-    totalOrders: orders.length,
-    totalProducts: products.length,
+    totalUsers,
+    totalOrders,
+    totalProducts,
+    totalCategories
   };
 };
 
@@ -189,18 +206,101 @@ export const deleteProduct = (id: number): Product | null => {
   return deleted;
 };
 
-export const getUsers = (): User[] => {
-  return users;
+export const getUsers = async (page: number = 1, limit: number = 10): Promise<PaginatedUsers> => {
+  const skip = (page - 1) * limit;
+
+  const [usersDoc, totalDocuments] = await Promise.all([
+    UserModel.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    UserModel.countDocuments()
+  ]);
+
+  const totalPages = Math.ceil(totalDocuments / limit);
+
+  return {
+    users: usersDoc,
+    pagination: {
+      totalDocuments,
+      totalPages,
+      currentPage: page,
+      limit
+    }
+  };
 };
 
-export const getProducts = (): Product[] => {
-  return products;
+export const deleteUser = async (id: string): Promise<any | null> => {
+  const deleted = await UserModel.findByIdAndDelete(id);
+  return deleted;
+};
+
+export const getProducts = async (page: number = 1, limit: number = 10, search?: string, category?: string): Promise<PaginatedProducts> => {
+  const skip = (page - 1) * limit;
+  const filter: any = {};
+  
+  if (search) {
+    filter.name = { $regex: search, $options: 'i' };
+  }
+  
+  if (category) {
+    if (mongoose.Types.ObjectId.isValid(category)) {
+        filter.category = category;
+    } else {
+        filter.category = category;
+    }
+  }
+
+  const [productsDoc, totalDocuments] = await Promise.all([
+    ProductModel.find(filter)
+      .populate('category', 'name')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    ProductModel.countDocuments(filter)
+  ]);
+
+  const totalPages = Math.ceil(totalDocuments / limit);
+
+  return {
+    products: productsDoc,
+    pagination: {
+      totalDocuments,
+      totalPages,
+      currentPage: page,
+      limit
+    }
+  };
 };
 
 export const getSalesData = (): ChartItem[] => {
   return salesData;
 };
 
-export const getOrders = (): Order[] => {
-  return orders;
+export const getOrders = async (page: number = 1, limit: number = 10): Promise<PaginatedOrders> => {
+  const skip = (page - 1) * limit;
+
+  const [ordersDoc, totalDocuments] = await Promise.all([
+    OrderModel.find()
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    OrderModel.countDocuments()
+  ]);
+
+  const totalPages = Math.ceil(totalDocuments / limit);
+
+  return {
+    orders: ordersDoc,
+    pagination: {
+      totalDocuments,
+      totalPages,
+      currentPage: page,
+      limit
+    }
+  };
 };

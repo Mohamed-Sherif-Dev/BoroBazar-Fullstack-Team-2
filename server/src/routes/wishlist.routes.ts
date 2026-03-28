@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { toggleWishlist, getWishlist, removeFromWishlist } from '../controllers/wishlist.controller';
+import { authMiddleware } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-router.post('/toggle', toggleWishlist);
+router.post('/toggle', authMiddleware, toggleWishlist);
 
-router.get('/:userId', getWishlist);
+router.get('/', authMiddleware, getWishlist);
 
-router.delete('/:userId/:productId', removeFromWishlist);
+router.delete('/:productId', authMiddleware, removeFromWishlist);
 
 export default router;

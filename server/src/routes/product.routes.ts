@@ -27,8 +27,8 @@ router.get("/products/category/:categoryId", getProductsByCategory);
 
 router.get("/products/search", searchProducts);
 
-router.get("/products/:id", getProductById);
-
 router.get("/products/related/:id", getRelatedProducts);
+
+router.get("/products/:id", getProductById);
 
 export default router;

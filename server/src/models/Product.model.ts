@@ -7,6 +7,10 @@ export interface IProduct extends Document {
   oldPrice?: number;
   rating: number;
   category: mongoose.Types.ObjectId | string;
+  subCategory?: string;
+  brand?: string;
+  stock?: number;
+  sales?: number;
   isFeatured: boolean;
   isPopular: boolean;
 }
@@ -43,6 +47,25 @@ const ProductSchema = new Schema(
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
     required: true
+  },
+
+  subCategory: {
+    type: String
+  },
+
+  brand: {
+    type: String,
+    default: ""
+  },
+
+  stock: {
+    type: Number,
+    default: 0
+  },
+
+  sales: {
+    type: Number,
+    default: 0
   },
 
   isFeatured: {
