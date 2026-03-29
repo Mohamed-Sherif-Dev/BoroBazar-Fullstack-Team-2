@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 export interface AuthRequest extends Request {
   user?: {
     userId: string;
+    role: "user" | "admin";
   };
 }
 
@@ -25,10 +26,11 @@ export const authMiddleware = (
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET as string
-    ) as { userId: string };
+    ) as { userId: string; role: "user" | "admin" };
 
     req.user = decoded;
     next();
+
   } catch (error) {
     res.status(401).json({
       success: false,
