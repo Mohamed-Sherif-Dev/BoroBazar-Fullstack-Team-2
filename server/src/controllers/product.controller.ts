@@ -190,20 +190,35 @@ export const searchProducts = async (req: Request, res: Response) => {
 
   try {
 
-    const query = req.query.q as string;
+    const {
+      q,
+      category,
+      subCategory,
+      minPrice,
+      maxPrice,
+      minRating,
+      sort,
+      page,
+      limit
+    } = req.query;
 
-    if (!query) {
-      return res.status(400).json({
-        success: false,
-        message: "Search query is required"
-      });
-    }
+    const options = {
+      q: q as string,
+      category: category as string,
+      subCategory: subCategory as string,
+      minPrice: minPrice ? parseFloat(minPrice as string) : undefined,
+      maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
+      minRating: minRating ? parseFloat(minRating as string) : undefined,
+      sort: sort as string,
+      page: page ? parseInt(page as string) : undefined,
+      limit: limit ? parseInt(limit as string) : undefined
+    };
 
-    const products = await searchProductsService(query);
+    const result = await searchProductsService(options);
 
     res.status(200).json({
       success: true,
-      data: products
+      ...result
     });
 
   } catch (error) {
@@ -215,4 +230,4 @@ export const searchProducts = async (req: Request, res: Response) => {
 
   }
 
-};
+};

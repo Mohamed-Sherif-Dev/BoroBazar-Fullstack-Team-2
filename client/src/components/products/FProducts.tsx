@@ -1,20 +1,26 @@
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import { getFProducts } from "../../services/productService";
-import type { Product } from "../../types/product";
+
 
 export default function FProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getFProducts()
-      .then((data) => setProducts(data))
-      .catch(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await getFProducts();
+        setProducts(response.data.data);
+      } catch (error) {
+        console.error("Error fetching featured products:", error);
         // Fallback mock data when API is unavailable
         setProducts(getMockFeaturedProducts());
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
   }, []);
 
   return (
@@ -65,11 +71,10 @@ export default function FProducts() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
-          {products.map((product, index) => (
+          {products.map((product: any) => (
             <div
               key={product.id}
-              className="animate-fade-in-up"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className="px-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 flex-shrink-0 snap-start"
             >
               <ProductCard product={product} />
             </div>
@@ -84,7 +89,7 @@ export default function FProducts() {
    Mock Data (fallback)
 ===================== */
 
-function getMockFeaturedProducts(): Product[] {
+function getMockFeaturedProducts(): any[] {
   return [
     {
       id: 101,

@@ -25,7 +25,7 @@ const AdminRegisterPage = () => {
     mutationFn: registerUser,
     onSuccess: (res) => {
       sessionStorage.setItem("pendingVerifyEmail", res.data.email);
-      navigate("/admin/verify", { state: { email: res.data.email } });
+      navigate("/admin/dashboard");
     },
     onError: (error: any) => {
       const msg =

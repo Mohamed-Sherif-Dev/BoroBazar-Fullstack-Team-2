@@ -1,20 +1,34 @@
-
-
-
-const CATEGORIES = [
-    { name: "Fruits & Vegetables", icon: "🍎" },
-    { name: "Meats & Seafood", icon: "🍖" },
-    { name: "Breakfast & Dairy", icon: "🍳" },
-    { name: "Breads & Bakery", icon: "🍞" },
-    { name: "Beverages", icon: "🥤" },
-    { name: "Frozen Foods", icon: "🍦" },
-    { name: "Biscuits & Snacks", icon: "🍪" },
-    { name: "Grocery & Staples", icon: "📦" },
-    { name: "Baby & Pregnancy", icon: "🍼" },
-    { name: "Healthcare", icon: "💊" },
-];
+import { useCategories } from "@/hooks/useCategories";
+import type { Category } from "@/types/category";
 
 export default function TopCategories() {
+    const { data: categories = [], isLoading, error } = useCategories();
+
+    if (isLoading) {
+        return (
+            <section className="mt-10 mb-12">
+                <div className="flex items-center justify-between mb-8">
+                    <div className="h-8 w-48 bg-gray-200 animate-pulse rounded"></div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4">
+                    {[...Array(10)].map((_, i) => (
+                        <div key={i} className="flex flex-col items-center">
+                            <div className="w-full aspect-square rounded-xl bg-gray-100 animate-pulse mb-3"></div>
+                            <div className="h-3 w-16 bg-gray-100 animate-pulse rounded"></div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+        );
+    }
+
+    if (error) {
+        return null; // Or show error message
+    }
+
+    // Only show top 10 for "Top Categories"
+    const topCategories = categories.slice(0, 10);
+
     return (
         <section id="top-categories" className="mt-10 mb-12">
             <div className="flex items-center justify-between mb-8">
@@ -49,15 +63,17 @@ export default function TopCategories() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4">
-                {CATEGORIES.map((cat, index) => (
+                {topCategories.map((cat: Category) => (
                     <div
-                        key={index}
+                        key={cat._id}
                         className="group cursor-pointer flex flex-col items-center"
                     >
-                        <div className="w-full aspect-square rounded-xl bg-gray-50 flex items-center justify-center mb-3 transition-all group-hover:bg-white group-hover:shadow-md border border-transparent group-hover:border-gray-100">
-                            <span className="text-3xl group-hover:scale-110 transition-transform duration-300">
-                                {cat.icon}
-                            </span>
+                        <div className="w-full aspect-square rounded-xl bg-gray-50 flex items-center justify-center mb-3 transition-all group-hover:bg-white group-hover:shadow-md border border-transparent group-hover:border-gray-100 overflow-hidden p-4">
+                            <img 
+                                src={cat.image} 
+                                alt={cat.name}
+                                className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                            />
                         </div>
                         <span className="text-[11px] sm:text-xs font-medium text-heading text-center line-clamp-2 leading-tight">
                             {cat.name}

@@ -37,7 +37,7 @@ function CategoryDropdown() {
   function search(category: Category) {
     const params = new URLSearchParams(searchParams);
 
-    params.set("category", category.id);
+    params.set("category", category._id);
 
     navigate(`/products?${params.toString()}`);
   }
@@ -63,10 +63,11 @@ function CategoryDropdown() {
     <section>
       <ul className="mt-5 flex justify-evenly">
         {categories.slice(0, visibleCount).map((category: Category) => (
+          <li key={category._id}>
           <li key={category.id}>
             <button
               className={`cursor-pointer duration-300 hover:text-zinc-800 ${
-                selectedCategory === category.id
+                selectedCategory === category._id
                   ? "font-semibold text-green-700"
                   : "text-zinc-700"
               }`}
@@ -104,12 +105,14 @@ function CategoryDropdown() {
             >
               {categories
                 .slice(visibleCount)
+                .map((category: Category, index: number, arr: Category[]) => (
+                  <li key={category._id}>
                 .map((category: Category, index: number, arr: []) => (
                   <li key={category.id}>
                     <button
                       className={`w-full cursor-pointer duration-300 hover:text-zinc-800 
                         text-center ${
-                          selectedCategory === category.id
+                          selectedCategory === category._id
                             ? "font-semibold text-green-700"
                             : "text-zinc-700"
                         }`}
@@ -121,6 +124,9 @@ function CategoryDropdown() {
                       {category.name}
                     </button>
 
+                  {index !== arr.length - 1 && <hr className="my-3" />}
+                </li>
+              ))}
                     {index !== arr.length - 1 && <hr className="my-3" />}
                   </li>
                 ))}

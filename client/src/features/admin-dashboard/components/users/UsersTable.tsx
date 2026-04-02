@@ -1,171 +1,198 @@
-// src/features/admin-dashboard/components/UsersTable.tsx
-import { useMemo, useState, useEffect } from "react";
-import { CalendarDays, Mail, Phone, Search, Trash2, X, Loader2 } from "lucide-react";
-import type { UserItem } from "../../types/admin-dashboard.types";
+import { useCallback, useEffect, useState } from "react";
+import { CalendarDays, Mail, Trash2, X, Loader2, Search, RefreshCcw, UserCircle2 } from "lucide-react";
 import UsersTablePagination from "./UsersTablePagination";
 import { api } from "../../../../services/api";
 
+interface DBUser {
+  _id: string;
+  name: string;
+  email: string;
+  createdAt?: string;
+}
+
+interface Pagination {
+  totalDocuments: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+}
+
 export default function UsersTable() {
-  const [users, setUsers] = useState<UserItem[]>([]);
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [userToDelete, setUserToDelete] = useState<UserItem | null>(null);
+  const [users, setUsers] = useState<DBUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<Pagination>({
+    totalDocuments: 0,
+    totalPages: 1,
+    currentPage: 1,
+    limit: 10,
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [search, setSearch] = useState("");
+
+  const [userToDelete, setUserToDelete] = useState<DBUser | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await api.getUsers({ page: currentPage, limit: rowsPerPage });
+
+      if (result?.success) {
+        setUsers(result.data.users);
+        setPagination(result.data.pagination);
+      } else {
+        setError("Failed to fetch users.");
+      }
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage, rowsPerPage]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const result = await api.getUsers();
-        setUsers(result.data);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
-  const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
-      const keyword = search.toLowerCase();
-
-      return (
-        user.name.toLowerCase().includes(keyword) ||
-        user.email.toLowerCase().includes(keyword) ||
-        user.phone.toLowerCase().includes(keyword) ||
-        user.createdAt.toLowerCase().includes(keyword)
-      );
-    });
-  }, [users, search]);
-
-  const totalItems = filteredUsers.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / rowsPerPage));
-  const start = (currentPage - 1) * rowsPerPage;
-  const paginatedUsers = filteredUsers.slice(start, start + rowsPerPage);
-
-  const startIndex = totalItems === 0 ? 0 : start + 1;
-  const endIndex = Math.min(start + rowsPerPage, totalItems);
-
-  const confirmDelete = () => {
-    if (userToDelete === null) return;
-    setUsers((prev) => prev.filter((user) => user.id !== userToDelete.id));
-    setUserToDelete(null);
-  };
-
-  const handleDeleteClick = (user: UserItem) => {
-    setUserToDelete(user);
-  };
+  // Client-side search on the current page
+  const filteredUsers = search
+    ? users.filter(
+        (u) =>
+          u.name.toLowerCase().includes(search.toLowerCase()) ||
+          u.email.toLowerCase().includes(search.toLowerCase())
+      )
+    : users;
 
   const handleRowsPerPageChange = (value: number) => {
     setRowsPerPage(value);
     setCurrentPage(1);
   };
 
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-    setCurrentPage(1);
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+    setDeleting(true);
+    try {
+      await api.deleteUser(userToDelete._id);
+      setUserToDelete(null);
+      fetchUsers();
+    } catch {
+      // silently handle
+    } finally {
+      setDeleting(false);
+    }
   };
+
+  const startIndex = pagination.totalDocuments === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+  const endIndex = Math.min(currentPage * rowsPerPage, pagination.totalDocuments);
 
   return (
     <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      {/* Header */}
       <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3 md:flex-row md:items-center md:justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Users List</h2>
+        <h2 className="text-lg font-semibold text-gray-900">
+          Users List
+          <span className="ml-2 text-sm font-normal text-gray-400">
+            ({pagination.totalDocuments} total)
+          </span>
+        </h2>
 
-        <div className="relative w-full md:w-[280px] lg:w-[320px]">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="Search here..."
-            className="h-10 w-full rounded-md border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm outline-none placeholder:text-gray-400"
-          />
+        <div className="flex items-center gap-2">
+          <div className="relative w-full md:w-[260px]">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search users..."
+              className="h-9 w-full rounded-md border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm outline-none placeholder:text-gray-400 focus:border-blue-400"
+            />
+          </div>
+          <button
+            onClick={fetchUsers}
+            className="rounded-md border border-gray-200 p-2 text-gray-500 hover:bg-gray-50"
+            title="Refresh"
+          >
+            <RefreshCcw size={15} />
+          </button>
         </div>
       </div>
 
+      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold uppercase text-gray-500">
-              <th className="px-4 py-3">
-                <input type="checkbox" />
-              </th>
               <th className="px-4 py-3">User</th>
-              <th className="px-4 py-3">User Phone No</th>
-              <th className="px-4 py-3">Created</th>
-              <th className="px-4 py-3">Action</th>
+              <th className="px-4 py-3">Email</th>
+              <th className="px-4 py-3">Joined</th>
+              <th className="px-4 py-3 text-right">Action</th>
             </tr>
           </thead>
-
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5} className="px-4 py-12 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-3 text-gray-500">
+                <td colSpan={4} className="px-4 py-12 text-center">
+                  <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
                     <Loader2 className="h-6 w-6 animate-spin text-emerald-500" />
-                    <p className="text-sm font-medium">Loading users...</p>
+                    <p className="text-sm">Loading users...</p>
                   </div>
                 </td>
               </tr>
-            ) : paginatedUsers.length > 0 ? (
-              paginatedUsers.map((user) => (
-                <tr key={user.id} className="border-b border-gray-100">
-                  <td className="px-4 py-4 align-top">
-                    <input type="checkbox" />
-                  </td>
-
+            ) : error ? (
+              <tr>
+                <td colSpan={4} className="px-4 py-10 text-center">
+                  <p className="text-sm text-red-500">{error}</p>
+                  <button onClick={fetchUsers} className="mt-2 text-xs text-blue-500 underline">Retry</button>
+                </td>
+              </tr>
+            ) : filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
+                <tr key={user._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-4">
-                    <div className="flex items-start gap-3">
-                      <img
-                        src={user.image}
-                        alt={user.name}
-                        className="h-10 w-10 rounded-md object-cover"
-                      />
-
-                      <div>
-                        <p className="font-medium text-gray-900">{user.name}</p>
-
-                        <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
-                          <Mail size={12} />
-                          <span>{user.email}</span>
-                        </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-400 shrink-0">
+                        <UserCircle2 size={22} />
                       </div>
+                      <span className="font-medium text-gray-900">{user.name}</span>
                     </div>
                   </td>
 
                   <td className="px-4 py-4">
-                    <div className="flex items-center gap-1 text-gray-700">
-                      <Phone size={13} />
-                      <span>{user.phone}</span>
+                    <div className="flex items-center gap-1 text-gray-600">
+                      <Mail size={13} className="text-gray-400" />
+                      <span>{user.email}</span>
                     </div>
                   </td>
 
                   <td className="px-4 py-4">
-                    <div className="flex items-center gap-1 text-gray-700">
-                      <CalendarDays size={13} />
-                      <span>{user.createdAt}</span>
-                    </div>
+                    {user.createdAt ? (
+                      <div className="flex items-center gap-1 text-gray-500 text-xs">
+                        <CalendarDays size={13} />
+                        <span>{new Date(user.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-xs">—</span>
+                    )}
                   </td>
 
-                  <td className="px-4 py-4">
+                  <td className="px-4 py-4 text-right">
                     <button
-                      onClick={() => handleDeleteClick(user)}
-                      className="rounded border border-red-200 px-3 py-1 text-xs font-medium text-red-500 transition hover:bg-red-50"
+                      onClick={() => setUserToDelete(user)}
+                      className="inline-flex items-center gap-1 rounded border border-red-200 px-3 py-1 text-xs font-medium text-red-500 transition hover:bg-red-50 hover:border-red-300"
                     >
-                      DELETE
+                      <Trash2 size={13} />
+                      Delete
                     </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
                   No users found.
                 </td>
               </tr>
@@ -176,79 +203,61 @@ export default function UsersTable() {
 
       <UsersTablePagination
         currentPage={currentPage}
-        totalPages={totalPages}
+        totalPages={pagination.totalPages}
         rowsPerPage={rowsPerPage}
-        totalItems={totalItems}
+        totalItems={pagination.totalDocuments}
         startIndex={startIndex}
         endIndex={endIndex}
         onPrev={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-        onNext={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        onNext={() => setCurrentPage((prev) => Math.min(prev + 1, pagination.totalPages))}
         onRowsPerPageChange={handleRowsPerPageChange}
       />
 
+      {/* Delete Confirmation Modal */}
       {userToDelete !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg overflow-hidden rounded-xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-red-100 bg-red-50 p-5">
-              <h2 className="text-xl font-semibold text-red-700">Confirm Deletion</h2>
+          <div className="w-full max-w-sm overflow-hidden rounded-xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-red-100 bg-red-50 p-4">
+              <h2 className="text-base font-semibold text-red-700">Delete User</h2>
               <button
                 onClick={() => setUserToDelete(null)}
-                className="rounded-full p-2 text-red-400 hover:bg-red-100 hover:text-red-600"
+                className="rounded-full p-1.5 text-red-400 hover:bg-red-100"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="p-6 md:flex gap-6">
-              <div className="mb-4 shrink-0 md:mb-0">
-                <img
-                  src={userToDelete.image}
-                  alt={userToDelete.name}
-                  className="h-24 w-24 rounded-lg object-cover shadow-sm border border-gray-100"
-                />
+            <div className="p-5 space-y-3">
+              <div className="rounded-md bg-red-50 border border-red-100 p-3">
+                <p className="text-sm text-red-800 font-medium">
+                  Are you sure you want to delete this user? This action cannot be undone.
+                </p>
               </div>
-
-              <div className="flex-1 space-y-3">
-                <div className="rounded-md bg-red-50 p-3 mb-3 border border-red-100">
-                  <p className="text-sm text-red-800 font-medium">
-                    Are you sure you want to delete this user? This action cannot be undone.
-                  </p>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-400 shrink-0">
+                  <UserCircle2 size={22} />
                 </div>
-
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">{userToDelete.name}</h3>
-                </div>
-
-                <div className="space-y-2 pt-2">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Mail size={16} className="text-gray-400" />
-                    <span>{userToDelete.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Phone size={16} className="text-gray-400" />
-                    <span>{userToDelete.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <CalendarDays size={16} className="text-gray-400" />
-                    <span>Joined: {userToDelete.createdAt}</span>
-                  </div>
+                  <p className="font-semibold text-gray-900">{userToDelete.name}</p>
+                  <p className="text-xs text-gray-500">{userToDelete.email}</p>
                 </div>
               </div>
             </div>
 
-            <div className="border-t border-gray-100 bg-gray-50 p-5 flex justify-end gap-3">
+            <div className="border-t border-gray-100 bg-gray-50 p-4 flex justify-end gap-3">
               <button
                 onClick={() => setUserToDelete(null)}
-                className="rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="rounded-lg bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 flex items-center gap-2"
+                disabled={deleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 flex items-center gap-2 disabled:opacity-50"
               >
-                <Trash2 size={16} />
-                Delete User
+                {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                Delete
               </button>
             </div>
           </div>

@@ -4,12 +4,12 @@ export interface IUser extends Document {
     name: string;
     email: string;
     password: string;
+    phone?: string;
+    avatar?: string;
     otp?: string;
     otpExpires?: Date;
+    role: "user" | "admin";
 }
-
-
-
 
 const userSchema = new Schema<IUser>({
     name: {
@@ -25,15 +25,27 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: true,
     },
+    phone: {
+        type: String,
+    },
+    avatar: {
+        type: String,
+    },
     otp:{
         type: String,
     },
     otpExpires:{
         type: Date,
+    },
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user",
     }
 }, {
     timestamps: true,
 });
+
 
 
 export default mongoose.model<IUser>('User', userSchema);

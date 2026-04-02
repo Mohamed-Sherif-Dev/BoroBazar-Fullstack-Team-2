@@ -1,15 +1,15 @@
 import {
   Clock3,
   Gift,
-  CircleDollarSign,
   Tag,
   BarChart3,
   Loader2,
+  Layers,
 } from "lucide-react";
 
 interface DashboardStatsProps {
   stats: {
-    totalSales: number;
+    totalCategories: number;
     totalUsers: number;
     totalOrders: number;
     totalProducts: number;
@@ -60,10 +60,10 @@ export default function DashboardStats({ stats, loading }: DashboardStatsProps) 
     },
     {
       id: 4,
-      title: "Total Sales",
-      value: `$${stats.totalSales}`,
+      title: "Total Categories",
+      value: stats.totalCategories,
       bg: "bg-pink-500",
-      leftIcon: CircleDollarSign,
+      leftIcon: Layers,
       rightIcon: BarChart3,
     },
   ];

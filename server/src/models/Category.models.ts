@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface ICategory extends Document {
     name: string;
     image: string,
+    subCategories: string[],
     isActive: boolean,
     createdAt: Date,
     updatedAt: Date
@@ -20,6 +21,9 @@ const CategorySchema: Schema = new Schema({
         type: String,
         required: true
     },
+    subCategories: [{
+        type: String
+    }],
     isActive: {
         type: Boolean,
         default: true
