@@ -1,0 +1,1 @@
+export { default as FeaturedProductsSection } from "./components/FeaturedProductsSection";

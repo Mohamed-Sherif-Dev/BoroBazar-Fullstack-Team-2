@@ -1,0 +1,141 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import type { Category } from "../../types/category";
+import downIcon from "../../assets/Icons/navbar/downIcon.png";
+import { useCategories } from "@/hooks/useCategories";
+
+function CategoryDropdown() {
+  const [more, setMore] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(9);
+
+  const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const selectedCategory = searchParams.get("category") ?? "";
+
+  const { data: categories = [], isLoading, error } = useCategories();
+
+  useEffect(() => {
+    function handleResize() {
+      const width = window.innerWidth;
+
+      if (width >= 1280) {
+        setVisibleCount(9);
+      } else if (width >= 768) {
+        setVisibleCount(6);
+      } else {
+        setVisibleCount(1);
+      }
+    }
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  function search(category: Category) {
+    const params = new URLSearchParams(searchParams);
+
+    params.set("category", category._id);
+
+    navigate(`/products?${params.toString()}`);
+  }
+
+  if (isLoading) {
+    return (
+      <div className="mt-5 text-center flex justify-center items-center gap-2">
+        Loading categories
+        <span className="inline-block w-10 h-10 border-4 border-white border-b-[#FF3D00] rounded-full animate-spin box-border"></span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mt-5 text-center text-red-700">
+        Failed to load categories
+      </div>
+    );
+  }
+
+  return (
+    <section>
+      <ul className="mt-5 flex justify-evenly">
+        {categories.slice(0, visibleCount).map((category: Category) => (
+          <li key={category._id}>
+          <li key={category.id}>
+            <button
+              className={`cursor-pointer duration-300 hover:text-zinc-800 ${
+                selectedCategory === category._id
+                  ? "font-semibold text-green-700"
+                  : "text-zinc-700"
+              }`}
+              onClick={() => {
+                setMore(false);
+                search(category);
+              }}
+            >
+              {category.name}
+            </button>
+          </li>
+        ))}
+
+        <li className="relative z-50">
+          <button
+            type="button"
+            className="flex cursor-pointer items-end gap-1"
+            onClick={() => setMore((v) => !v)}
+          >
+            <span className="text-zinc-700 hover:text-zinc-800 duration-300">
+              More
+            </span>
+            <img
+              src={downIcon}
+              alt="Drop Down"
+              className={`h-4 w-4 duration-100 ${more ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {more && (
+            <ul
+              className="absolute left-1/2 mt-2 max-h-40 overflow-y-scroll
+            flex min-w-[120px] 
+            -translate-x-1/2 flex-col rounded-lg bg-white p-3 shadow-lg"
+            >
+              {categories
+                .slice(visibleCount)
+                .map((category: Category, index: number, arr: Category[]) => (
+                  <li key={category._id}>
+                .map((category: Category, index: number, arr: []) => (
+                  <li key={category.id}>
+                    <button
+                      className={`w-full cursor-pointer duration-300 hover:text-zinc-800 
+                        text-center ${
+                          selectedCategory === category._id
+                            ? "font-semibold text-green-700"
+                            : "text-zinc-700"
+                        }`}
+                      onClick={() => {
+                        setMore(false);
+                        search(category);
+                      }}
+                    >
+                      {category.name}
+                    </button>
+
+                  {index !== arr.length - 1 && <hr className="my-3" />}
+                </li>
+              ))}
+                    {index !== arr.length - 1 && <hr className="my-3" />}
+                  </li>
+                ))}
+            </ul>
+          )}
+        </li>
+      </ul>
+    </section>
+  );
+}
+
+export default CategoryDropdown;
