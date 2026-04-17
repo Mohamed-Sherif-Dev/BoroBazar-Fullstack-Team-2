@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import AccountSidebar from "../components/account/AccountSidebar";
 import WishlistList from "../features/wishlist/components/WishlistList";
@@ -52,7 +52,7 @@ const initialMockData = [
 ];
 
 function useWishlist() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -64,7 +64,7 @@ function useWishlist() {
   }, []);
 
   const removeItem = (id: number) => {
-    setData((prev) => prev.filter((item) => item.id !== id));
+    setData((prev) => prev.filter((item: any) => item.id !== id));
   };
 
   return { data, isLoading, removeItem };

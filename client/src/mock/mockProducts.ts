@@ -1,6 +1,5 @@
-import type { Product } from "../types/product";
 
-export const mockProducts: Product[] = [
+export const mockProducts: any[] = [
   {
     id: "1",
     title: "Wireless Headphones",

@@ -59,7 +59,7 @@
 //  )
 // }
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { X, Star, ChevronDown } from "lucide-react";
 
 // ---------------------------------------------------------
@@ -114,7 +114,7 @@ const initialMockData = [
 ];
 
 function useCart() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -126,11 +126,11 @@ function useCart() {
     return () => clearTimeout(timer);
   }, []);
 
-  const removeItem = (id) => {
+  const removeItem = (id: number) => {
     setData(prev => prev.filter(item => item.id !== id));
   };
 
-  const updateQuantity = (id, newQuantity) => {
+  const updateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity < 1) return;
     setData(prev => prev.map(item => 
       item.id === id ? { ...item, quantity: newQuantity } : item
@@ -162,7 +162,7 @@ const EmptyCart = () => (
   </div>
 );
 
-const CartList = ({ items, removeItem, updateQuantity }) => (
+const CartList = ({ items, removeItem, updateQuantity }: { items: any[], removeItem: (id: number) => void, updateQuantity: (id: number, qty: number) => void }) => (
   <div className="flex flex-col">
     {/* Header of the List Card */}
     <div className="p-6 border-b border-gray-200">
@@ -176,7 +176,7 @@ const CartList = ({ items, removeItem, updateQuantity }) => (
 
     {/* Items Loop */}
     <div className="flex flex-col">
-      {items.map((item) => (
+      {items.map((item: any) => (
         <div key={item.id} className="relative p-6 border-b border-gray-200 last:border-0 flex gap-6 items-start">
           
           {/* Product Image */}
@@ -234,7 +234,7 @@ const CartList = ({ items, removeItem, updateQuantity }) => (
   </div>
 );
 
-const CartTotals = ({ subtotal }) => {
+const CartTotals = ({}: { subtotal?: number }) => {
   // للتقريب لصورة الفيجما، السعر الظاهر هو 2133
   // بما أننا نستخدم mock data، سنعرض الرقم الموجود في التصميم كأنه الإجمالي الفعلي لتطابق الصورة
   const displayTotal = "2,133"; 
@@ -293,7 +293,7 @@ export default function CartPage() {
   if (!data || data.length === 0) return <EmptyCart />;
 
   const subtotal = data.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+    (acc, item: any) => acc + item.price * item.quantity,
     0
   );
 
