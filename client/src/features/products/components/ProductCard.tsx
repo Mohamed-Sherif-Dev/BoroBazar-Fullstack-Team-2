@@ -7,8 +7,7 @@ import { Link } from "react-router-dom";
 
 export default function ProductCard({ product }: { product: IProduct }) {
   // convert rating to 5-star system
-  const fullStars = Math.floor(product.rating || 0);
-  const emptyStars = 5 - fullStars;
+  const fullStars = product.rating || 5;
 
   return (
     <Card className="group w-full ring-0 rounded-xl border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col overflow-hidden bg-white">

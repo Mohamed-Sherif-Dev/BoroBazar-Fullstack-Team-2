@@ -2,63 +2,52 @@ import Sidebar from "./Sidebar";
 import DashboardStats from "./DashboardStats";
 import ProductsTable from "./products/ProductsTable";
 import UsersTable from "./users/UsersTable";
+import OrdersTable from "./orders/OrdersTable";
 import SalesChart from "./SalesChart";
 import { useEffect, useState } from "react";
 import AddProductForm from "./AddProductForm";
 import UserForm from "./users/UserForm";
 import CategoryTable from "./CategoryTable";
-import type { ProductItem, UserItem } from "../types/admin-dashboard.types";
-import { X, Star } from "lucide-react";
+import type { UserItem } from "../types/admin-dashboard.types";
+import { X, Star, AlertCircle } from "lucide-react";
 import { api } from "../../../services/api";
 
-type AdminView = "dashboard" | "add-product" | "edit-product" | "add-user" | "edit-user" | "view-product" | "category" | "users";
+type AdminView = "dashboard" | "add-product" | "edit-product" | "add-user" | "edit-user" | "view-product" | "category" | "users" | "orders";
 
 export default function AdminDashboard() {
   const [view, setView] = useState<AdminView>("dashboard");
-  const [products, setProducts] = useState<ProductItem[]>([]);
-  const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [editingUser, setEditingUser] = useState<UserItem | null>(null);
-  const [viewedProduct, setViewedProduct] = useState<ProductItem | null>(null);
+  const [viewedProduct, setViewedProduct] = useState<any | null>(null);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
+  const [statsError, setStatsError] = useState(false);
 
   const [dashboardStats, setDashboardStats] = useState({
-    totalSales: 0,
+    totalCategories: 0,
     totalUsers: 0,
     totalOrders: 0,
     totalProducts: 0,
   });
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [dashboardResult, productsResult] = await Promise.all([
-          api.getDashboard(),
-          api.getProducts(),
-        ]);
-        setDashboardStats(dashboardResult.data);
-        setProducts(productsResult.data);
-      } catch (error) {
-        console.error("Failed to fetch dashboard data:", error);
+        const dashboardResult = await api.getDashboard();
+        if (dashboardResult?.success) {
+          setDashboardStats(dashboardResult.data);
+        } else {
+          setStatsError(true);
+        }
+      } catch {
+        setStatsError(true);
       } finally {
         setLoadingDashboard(false);
       }
     };
-
     fetchData();
   }, []);
 
-  const handleSaveProduct = (productData: Omit<ProductItem, 'id' | 'sales'>) => {
-    if (editingProduct) {
-      setProducts(prev => prev.map(p => p.id === editingProduct.id ? { ...p, ...productData } : p));
-    } else {
-      const newProduct: ProductItem = {
-        ...productData,
-        id: Date.now(),
-        sales: 0,
-      };
-      setProducts(prev => [newProduct, ...prev]);
-    }
+  const handleSaveProduct = () => {
     setView("dashboard");
     setEditingProduct(null);
   };
@@ -90,6 +79,10 @@ export default function AdminDashboard() {
       );
     }
 
+    if (view === "orders") {
+      return <OrdersTable />;
+    }
+
     if (view === "category") {
       return <CategoryTable />;
     }
@@ -104,19 +97,23 @@ export default function AdminDashboard() {
 
     return (
       <div className="space-y-6">
+        {statsError && (
+          <div className="flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+            <AlertCircle size={16} className="shrink-0" />
+            <span>Could not load dashboard stats. The API may be unavailable.</span>
+          </div>
+        )}
+
         <DashboardStats stats={dashboardStats} loading={loadingDashboard} />
 
         <ProductsTable
-          products={products}
-          setProducts={setProducts}
           onAddProduct={() => setView("add-product")}
           onEditProduct={(p) => { setEditingProduct(p); setView("edit-product"); }}
           onViewProduct={(p) => { setViewedProduct(p); setView("view-product"); }}
         />
         <UsersTable />
+        <OrdersTable />
         <SalesChart />
-
-
       </div>
     );
   };
@@ -140,9 +137,10 @@ export default function AdminDashboard() {
           <div className="p-6 md:flex gap-8">
             <div className="mb-6 shrink-0 md:mb-0">
               <img
-                src={viewedProduct.image}
+                src={viewedProduct.image || "/images/placeholder.png"}
                 alt={viewedProduct.name}
                 className="h-48 w-48 rounded-lg object-cover shadow-sm md:h-64 md:w-64"
+                onError={(e) => { (e.target as HTMLImageElement).src = "/images/placeholder.png"; }}
               />
             </div>
 
@@ -156,28 +154,34 @@ export default function AdminDashboard() {
 
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 border border-blue-100">
-                  {viewedProduct.category}
+                  {typeof viewedProduct.category === 'object' ? viewedProduct.category.name : viewedProduct.category}
                 </span>
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 border border-gray-200">
-                  {viewedProduct.subCategory}
-                </span>
+                {viewedProduct.subCategory && (
+                  <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 border border-gray-200">
+                    {viewedProduct.subCategory}
+                  </span>
+                )}
               </div>
 
               <div className="flex items-end gap-3 pt-2">
-                <span className="text-3xl font-bold text-emerald-600">${viewedProduct.price.toFixed(2)}</span>
+                <span className="text-3xl font-bold text-emerald-600">
+                  ${typeof viewedProduct.price === 'number' ? viewedProduct.price.toFixed(2) : viewedProduct.price}
+                </span>
                 {viewedProduct.oldPrice && (
-                  <span className="text-lg text-gray-400 line-through mb-1">${viewedProduct.oldPrice.toFixed(2)}</span>
+                  <span className="text-lg text-gray-400 line-through mb-1">
+                    ${typeof viewedProduct.oldPrice === 'number' ? viewedProduct.oldPrice.toFixed(2) : viewedProduct.oldPrice}
+                  </span>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Stock</p>
-                  <p className="text-lg font-medium text-gray-900">{viewedProduct.stock} units</p>
+                  <p className="text-lg font-medium text-gray-900">{viewedProduct.stock ?? 0} units</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Sales</p>
-                  <p className="text-lg font-medium text-gray-900">{viewedProduct.sales} total</p>
+                  <p className="text-lg font-medium text-gray-900">{viewedProduct.sales ?? 0} total</p>
                 </div>
               </div>
 
@@ -188,10 +192,10 @@ export default function AdminDashboard() {
                     <Star
                       key={i}
                       size={18}
-                      className={i < viewedProduct.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}
+                      className={i < (viewedProduct.rating || 0) ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}
                     />
                   ))}
-                  <span className="ml-2 text-sm font-medium text-gray-700">{viewedProduct.rating}.0 / 5.0</span>
+                  <span className="ml-2 text-sm font-medium text-gray-700">{(viewedProduct.rating || 0).toFixed(1)} / 5.0</span>
                 </div>
               </div>
             </div>
