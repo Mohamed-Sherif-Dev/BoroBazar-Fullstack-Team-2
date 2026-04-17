@@ -7,6 +7,8 @@ import WishlistPage from "../pages/WishlistPage";
 
 import ProductsPage from "@/features/products/pages/ProductsPage";
 import ProductDetails from "@/features/products/pages/ProductDetailsPage";
+import OrdersPage from "@/features/orders/pages/OrdersPage";
+import OrderDetailsPage from "@/features/orders/pages/OrderDetailsPage";
 
 // ─── Customer Auth ───────────────────────────────────────
 import LoginPage from "../pages/auth/customer/LoginPage";
@@ -30,6 +32,8 @@ const AppRouter = () => {
       <Route path="/products/:id" element={<ProductDetails />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/wishlist" element={<WishlistPage />} />
+      <Route path="/orders" element={<OrdersPage />} />
+      <Route path="/orders/:id" element={<OrderDetailsPage />} />
 
       {/* ─── Customer Auth Routes ─── */}
       <Route path="/login" element={<LoginPage />} />

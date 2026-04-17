@@ -2,9 +2,10 @@ import axios from "axios";
 import type { IProduct } from "../../../types/product";
 
 const apiClient = axios.create({
-  baseURL: "https://5e8f-41-236-161-153.ngrok-free.app/api",
+  baseURL: import.meta.env.DEV ? "/api" : `${import.meta.env.VITE_API_BASE_URL}/api`,
   headers: {
     "Content-Type": "application/json",
+    "ngrok-skip-browser-warning": "true",
   },
 });
 
